@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+  <title>Animal Classifier</title>
+</head>
+<body style="font-family: sans-serif; text-align: center;">
+  <h1>Upload an Animal Image</h1>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" required><br><br>
+    <input type="submit" value="Classify">
+  </form>
+
+  {% if label %}
+    <h2>Prediction: {{ label }}</h2>
+    <p>Confidence: {{ confidence | round(2) }}</p>
+    <img src="{{ image }}" alt="Uploaded Image" width="300">
+  {% endif %}
+</body>
+</html>
