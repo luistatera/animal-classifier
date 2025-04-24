@@ -69,7 +69,7 @@ def index():
 @app.route("/project", methods=["GET", "POST"])
 def project():
     try:
-        project_models = ["prj_best_cnn_model.keras", "prj_best_resnet_model.keras"]
+        project_models = get_available_models()
         
         if request.method == "POST":
             model_name = request.form.get("model", "prj_best_cnn_model.keras")
