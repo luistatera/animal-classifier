@@ -36,6 +36,14 @@
       border: 1px solid #ddd;
       border-radius: 4px;
     }
+    .error {
+      color: #721c24;
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
     img {
       max-width: 100%;
       height: auto;
@@ -45,6 +53,13 @@
 </head>
 <body>
   <h1>Animal Classifier</h1>
+  
+  {% if error %}
+    <div class="error">
+      {{ error }}
+    </div>
+  {% endif %}
+
   <form method="POST" enctype="multipart/form-data">
     <div class="form-group">
       <label for="model">Select Model:</label><br>
@@ -59,7 +74,7 @@
     
     <div class="form-group">
       <label for="file">Upload Image:</label><br>
-      <input type="file" name="file" id="file" required>
+      <input type="file" name="file" id="file" required accept="image/*">
     </div>
     
     <button type="submit">Classify Image</button>
