@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-  <title>Animal Classifier</title>
+  <title>Project Animal Classifier</title>
   <style>
     body {
       font-family: sans-serif;
@@ -63,7 +63,7 @@
   </style>
 </head>
 <body>
-  <h1>Animal Classifier</h1>
+  <h1>Project Animal Classifier</h1>
   <p>This model can identify the following 10 animals: dog (cane), horse (cavallo), elephant (elefante), butterfly (farfalla), chicken (gallina), cat (gatto), cow (mucca), sheep (pecora), spider (ragno), and squirrel (scoiattolo).</p>
   
   {% if error %}
@@ -90,13 +90,14 @@
   {% if image %}
     <form id="modelForm" method="POST">
       <div class="form-group">
-        <label for="model">Try Different Model:</label><br>
+        <label for="model">Select Model:</label><br>
         <select name="model" id="model" onchange="this.form.submit()">
-          {% for model in available_models %}
-            <option value="{{ model }}" {% if model == selected_model %}selected{% endif %}>
-              {{ model }}
-            </option>
-          {% endfor %}
+          <option value="prj_best_cnn_model.keras" {% if selected_model == "prj_best_cnn_model.keras" %}selected{% endif %}>
+            Simple CNN Model
+          </option>
+          <option value="best_resnet_model.pth" {% if selected_model == "best_resnet_model.pth" %}selected{% endif %}>
+            ResNet Model
+          </option>
         </select>
       </div>
     </form>
@@ -115,4 +116,4 @@
   {% endif %}
 
 </body>
-</html>
+</html> 
