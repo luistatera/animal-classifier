@@ -1,3 +1,6 @@
 flask
 tensorflow
 numpy
+torch
+torchvision
+pillow

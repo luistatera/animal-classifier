@@ -2,18 +2,75 @@
 <html>
 <head>
   <title>Animal Classifier</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .form-group {
+      margin: 20px 0;
+    }
+    select, input[type="file"] {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 300px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 20px;
+    }
+  </style>
 </head>
-<body style="font-family: sans-serif; text-align: center;">
-  <h1>Upload an Animal Image</h1>
+<body>
+  <h1>Animal Classifier</h1>
   <form method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" required><br><br>
-    <input type="submit" value="Classify">
+    <div class="form-group">
+      <label for="model">Select Model:</label><br>
+      <select name="model" id="model" required>
+        {% for model in available_models %}
+          <option value="{{ model }}" {% if model == selected_model %}selected{% endif %}>
+            {{ model }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="file">Upload Image:</label><br>
+      <input type="file" name="file" id="file" required>
+    </div>
+    
+    <button type="submit">Classify Image</button>
   </form>
 
   {% if label %}
-    <h2>Prediction: {{ label }}</h2>
-    <p>Confidence: {{ confidence | round(2) }}</p>
-    <img src="{{ image }}" alt="Uploaded Image" width="300">
+    <div class="result">
+      <h2>Prediction: {{ label }}</h2>
+      <p>Confidence: {{ (confidence * 100) | round(2) }}%</p>
+      <img src="{{ image }}" alt="Uploaded Image">
+    </div>
   {% endif %}
 </body>
 </html>
