@@ -92,11 +92,12 @@
       <div class="form-group">
         <label for="model">Try Different Model:</label><br>
         <select name="model" id="model" onchange="this.form.submit()">
-          {% for model in available_models %}
-            <option value="{{ model }}" {% if model == selected_model %}selected{% endif %}>
-              {{ model }}
-            </option>
-          {% endfor %}
+          <option value="best_cnn_model_luis.pth" {% if selected_model == "best_cnn_model_luis.pth" %}selected{% endif %}>
+            Simple CNN Model
+          </option>
+          <option value="best_resnet_model.pth" {% if selected_model == "best_resnet_model.pth" %}selected{% endif %}>
+            ResNet18 Model
+          </option>
         </select>
       </div>
     </form>

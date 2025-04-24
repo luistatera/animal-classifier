@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, session
-from model_loader import predict_label, get_available_models
+from model_loader import predict_label, get_available_models, load_model
 import os
 import logging
 
@@ -17,7 +17,7 @@ def index():
         available_models = get_available_models()
         
         if request.method == "POST":
-            model_name = request.form.get("model", "best_cnn_model.keras")
+            model_name = request.form.get("model", "best_cnn_model_luis.pth")
             
             # Handle new image upload
             if 'file' in request.files and request.files['file'].filename != '':
@@ -36,7 +36,10 @@ def index():
                                     selected_model=model_name)
             
             try:
-                label, confidence = predict_label(filepath, model_name)
+                # Load model and get its type
+                model, model_type = load_model(model_name)
+                label, confidence = predict_label(model, filepath, model_type)
+                
                 if label is None:
                     return render_template("index.html",
                                         warning=f"Image not recognized as any of the 10 animals (confidence: {confidence * 100:.2f}%)",
@@ -60,7 +63,7 @@ def index():
         session.clear()
         return render_template("index.html", 
                             available_models=available_models,
-                            selected_model="best_cnn_model.keras")
+                            selected_model="best_cnn_model_luis.pth")
     
     except Exception as e:
         app.logger.error(f"Application error: {str(e)}")
@@ -72,7 +75,7 @@ def project():
         project_models = get_available_models()
         
         if request.method == "POST":
-            model_name = request.form.get("model", "prj_best_cnn_model.keras")
+            model_name = request.form.get("model", "best_cnn_model_luis.pth")
             
             # Handle new image upload
             if 'file' in request.files and request.files['file'].filename != '':
@@ -90,7 +93,10 @@ def project():
                                     selected_model=model_name)
             
             try:
-                label, confidence = predict_label(filepath, model_name)
+                # Load model and get its type
+                model, model_type = load_model(model_name)
+                label, confidence = predict_label(model, filepath, model_type)
+                
                 if label is None:
                     return render_template("project.html",
                                         warning=f"Image not recognized as any of the 10 animals (confidence: {confidence * 100:.2f}%)",
@@ -110,7 +116,7 @@ def project():
         # Clear the session on fresh page load (GET request)
         session.clear()
         return render_template("project.html", 
-                            selected_model="prj_best_cnn_model.keras")
+                            selected_model="best_cnn_model_luis.pth")
     
     except Exception as e:
         app.logger.error(f"Application error: {str(e)}")
