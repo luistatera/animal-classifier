@@ -1,7 +1,10 @@
 # 🧠 Animal Image Classifier  
 *Ironhack AI/ML Bootcamp – Project 2*
 
-This project showcases an image classification system using deep learning. We applied **Convolutional Neural Networks (CNNs)** with **Transfer Learning (ResNet18)** to classify animal images into 10 categories. It covers model development, evaluation, and deployment via a Flask web app.
+![Python](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+This project showcases an image classification system using deep learning. We applied **Convolutional Neural Networks (CNNs)** with **Transfer Learning (ResNet18)** to classify animal images into 10 categories. It covers model development and evaluation.
 
 ---
 
@@ -40,18 +43,6 @@ We used the [Animals-10 dataset](https://www.kaggle.com/datasets/alessiocorrado9
 
 ---
 
-## 🌐 Deployment
-
-We deployed the model using a **Flask web app**, where users can:
-- Upload an image
-- Receive:
-  - Predicted class
-  - Top 3 class probabilities
-
-Includes a simple, responsive UI built with HTML templates.
-
----
-
 ## 📂 Project Structure
 
 ```
@@ -87,7 +78,6 @@ project2-animal-classifier/
 
 - Hands-on experience with CNNs in PyTorch
 - Applied real-world ML practices: data prep, tuning, and evaluation
-- Learned how to deploy ML models via web applications
 - Gained practical insights into experimentation and critical thinking in ML
 
 ---
@@ -98,7 +88,7 @@ project2-animal-classifier/
 
 ## 🏁 Final Thoughts
 
-This project represents the completion of our second major milestone in the Ironhack AI/ML Bootcamp. It demonstrates our capability to build, evaluate, and deploy deep learning models in a production-like environment.
+This project represents the completion of our second major milestone in the Ironhack AI/ML Bootcamp. It demonstrates our capability to build and evaluate deep learning models in a production-like environment.
 
 ![model diagram](https://github.com/user-attachments/assets/8b6c2b3f-7ce2-4165-ab34-da0238aafb43)
 
