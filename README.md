@@ -46,16 +46,19 @@ We used the [Animals-10 dataset](https://www.kaggle.com/datasets/alessiocorrado9
 ## 📂 Project Structure
 
 ```
-project2-animal-classifier/
-├── app/                # Flask app files
-│   └── app.py
-├── data/               # Sample test images
-├── models/             # Trained models (ignored in repo due to size)
-├── notebooks/          # Development notebooks
-├── utils/              # Preprocessing and model helper functions
-├── requirements.txt    # Dependency list
-├── report.pdf          # Final project report
-└── README.md
+animal-classifier/
+├── app.py              # Main Flask application
+├── model_loader.py     # Model loading and prediction functions
+├── requirements.txt    # Project dependencies
+├── .gitignore         # Git ignore rules
+├── .gcloudignore      # Google Cloud ignore rules
+├── img2test/          # Directory for test images
+├── models/            # Trained model files
+├── notebooks/         # Jupyter notebooks for development
+├── static/            # Static files (CSS, JS, images)
+├── templates/         # HTML templates
+├── utils/             # Utility functions
+└── temp/              # Temporary files
 ```
 
 ---
@@ -63,14 +66,23 @@ project2-animal-classifier/
 ## 🚀 Setup Instructions
 
 1. Clone the repository  
-2. Install dependencies:
+2. Create and activate a virtual environment (recommended):
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Linux/Mac
+   # or
+   .venv\Scripts\activate     # On Windows
+   ```
+3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-3. Run the Flask app:
+4. Run the Flask app:
    ```bash
-   python app/app.py
+   python app.py
    ```
+
+The application will be available at `http://localhost:5000`
 
 ---
 
