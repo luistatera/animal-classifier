@@ -1,6 +1,5 @@
-flask
-tensorflow
-numpy
-torch
-torchvision
-pillow
+Flask==2.0.1
+Pillow==8.3.1
+torch==2.0.0
+torchvision==0.15.1
+google-cloud-secret-manager==2.16.1

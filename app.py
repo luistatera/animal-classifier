@@ -4,10 +4,28 @@ import os
 import logging
 from io import BytesIO
 import base64
+from google.cloud import secretmanager
+
+def get_secret(secret_id):
+    try:
+        client = secretmanager.SecretManagerServiceClient()
+        name = f"projects/chiaraguru/secrets/{secret_id}/versions/latest"
+        response = client.access_secret_version(request={"name": name})
+        return response.payload.data.decode("UTF-8")
+    except Exception as e:
+        app.logger.error(f"Error fetching secret: {e}")
+        return None
 
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
-app.secret_key = 'your-secret-key-123'  # Simple secret key
+
+# Get the secret key from GCP Secret Manager
+secret_key = get_secret('FLASK_SECRET_KEY')
+if secret_key:
+    app.secret_key = secret_key
+else:
+    app.logger.warning("Using fallback secret key - not recommended for production")
+    app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-123')
 
 # Model display name mapping
 MODEL_DISPLAY_NAMES = {
@@ -18,14 +36,25 @@ MODEL_DISPLAY_NAMES = {
 @app.after_request
 def add_security_headers(response):
     """Add security headers to each response"""
+    # Security headers
     response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['Content-Security-Policy'] = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline';"
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     
-    # Cache control for static resources
+    # Content type headers
+    if not response.headers.get('Content-Type'):
+        response.headers['Content-Type'] = 'text/html; charset=utf-8'
+    
+    # Cache control headers
     if request.path.startswith('/static/'):
+        # Cache static resources for 1 year with cache busting
         response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
     else:
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        # No caching for dynamic content
+        response.headers['Cache-Control'] = 'no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
     
     return response
 
@@ -34,7 +63,8 @@ def get_image_data_url(file):
     file_content = file.read()
     file.seek(0)  # Reset file pointer for subsequent reads
     encoded = base64.b64encode(file_content).decode('utf-8')
-    return f"data:{file.content_type};base64,{encoded}"
+    mime_type = file.content_type or 'application/octet-stream'
+    return f"data:{mime_type};base64,{encoded}"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -146,6 +176,7 @@ def project():
         app.logger.error(f"Application error: {str(e)}")
         return render_template("project.html", error=f"Application error: {str(e)}")
 
+# Do not change this
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 8080))
