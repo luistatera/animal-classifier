@@ -84,6 +84,9 @@ project2-animal-classifier/
 
 This project marks the completion of our second major milestone in the Ironhack AI/ML bootcamp. It demonstrates our ability to build, evaluate, and deploy deep learning models in a production-like scenario.
 
+![image](https://github.com/user-attachments/assets/8b6c2b3f-7ce2-4165-ab34-da0238aafb43)
+
+
 ---
 
 **Made with ❤️ by Group 1 Proejct 2 @ Ironhack 2025**
