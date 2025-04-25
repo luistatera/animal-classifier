@@ -6,6 +6,7 @@ import torch
 import torchvision.transforms as transforms
 from PIL import Image
 from torchvision import models
+from io import BytesIO
 
 # Define the class labels in the same order used during training
 CLASS_NAMES = ['cane', 'cavallo', 'elefante', 'farfalla', 'gallina', 'gatto', 'mucca', 'pecora', 'ragno', 'scoiattolo']
@@ -157,79 +158,83 @@ def load_model(model_name):
     print(f"Loaded {model_name} successfully")
     return model, 'torch'
 
-def predict_label(model, image_path, model_type, confidence_threshold=0.3):
+def predict_label(model, image_data, model_type):
     """
-    Predict the label for a given image using the specified model.
-    
-    Args:
-        model: The loaded model (TensorFlow or PyTorch)
-        image_path: Path to the image file
-        model_type: Type of model ('tf' or 'torch')
-        confidence_threshold: Minimum confidence threshold for accepting predictions
-        
-    Returns:
-        tuple: (predicted_class_name, confidence) or (None, confidence) if below threshold
+    Predict the label for an image using the specified model
+    image_data can be either a file path or a BytesIO object
     """
     try:
-        if model_type == 'tf':
-            # Preprocess image for TensorFlow
-            processed_image = preprocess_image_tf(image_path)
-            
-            # Get predictions
-            predictions = model.predict(processed_image, verbose=0)
-            
-            # Apply softmax to get probabilities
-            probabilities = tf.nn.softmax(predictions).numpy()
-            
-            # Get top 3 predictions for debugging
-            top_3_idx = np.argsort(probabilities[0])[-3:][::-1]
-            print("\nTop 3 Predictions (TensorFlow):")
-            for idx in top_3_idx:
-                print(f"{CLASS_NAMES[idx]}: {probabilities[0][idx]*100:.2f}%")
-            
-            # Get the predicted class index and confidence
-            predicted_class_idx = np.argmax(probabilities[0])
-            confidence = float(probabilities[0][predicted_class_idx])
-            
-        else:  # PyTorch model
-            # Ensure model is in evaluation mode
-            model.eval()
-            
-            # Preprocess image for PyTorch
-            device = next(model.parameters()).device
-            processed_image = preprocess_image_torch(image_path).to(device)
-            
-            print(f"\nModel Device: {device}")
-            print(f"Input Image Shape: {processed_image.shape}")
-            
-            # Get predictions
-            with torch.no_grad():
-                predictions = model(processed_image)
-                probabilities = torch.nn.functional.softmax(predictions, dim=1)
-                
-                # Get top 3 predictions for debugging
-                top_3_prob, top_3_idx = torch.topk(probabilities[0], 3)
-                print("\nTop 3 Predictions (PyTorch):")
-                for prob, idx in zip(top_3_prob, top_3_idx):
-                    print(f"{CLASS_NAMES[idx.item()]}: {prob.item()*100:.2f}%")
-                
-                # Get the predicted class index and confidence
-                predicted_class_idx = torch.argmax(probabilities[0]).item()
-                confidence = float(probabilities[0][predicted_class_idx])
+        # Load and preprocess the image
+        if isinstance(image_data, str):
+            # If image_data is a file path
+            image = Image.open(image_data)
+        else:
+            # If image_data is a BytesIO object
+            image = Image.open(image_data)
         
-        # Debug information
-        print("\nFinal Prediction:")
-        print(f"Predicted class index: {predicted_class_idx}")
-        print(f"Predicted class: {CLASS_NAMES[predicted_class_idx]}")
+        print(f"Image opened successfully. Mode: {image.mode}, Size: {image.size}")
+        
+        # Convert grayscale to RGB if needed
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+            print("Converted image to RGB mode")
+        
+        # Define the transformation pipeline based on model type
+        if isinstance(model, SimpleCNN):
+            # SimpleCNN expects 128x128 input
+            transform = transforms.Compose([
+                transforms.Resize((128, 128)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            ])
+            print("Using SimpleCNN preprocessing (128x128)")
+        else:
+            # ResNet expects 224x224 input
+            transform = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            ])
+            print("Using ResNet preprocessing (224x224)")
+        
+        # Apply transformations
+        image_tensor = transform(image).unsqueeze(0)
+        print(f"Transformed image tensor shape: {image_tensor.shape}")
+        
+        # Move to the same device as the model
+        device = next(model.parameters()).device
+        image_tensor = image_tensor.to(device)
+        print(f"Using device: {device}")
+        
+        # Get predictions
+        with torch.no_grad():
+            outputs = model(image_tensor)
+            probabilities = torch.nn.functional.softmax(outputs, dim=1)
+            confidence, predicted = torch.max(probabilities, 1)
+            
+            # Print all class probabilities for debugging
+            probs = probabilities[0].cpu().numpy()
+            print("\nClass probabilities:")
+            for idx, (class_name, prob) in enumerate(zip(CLASS_NAMES, probs)):
+                print(f"{class_name}: {prob*100:.2f}%")
+            
+        # Get the predicted class and confidence
+        confidence = confidence.item()
+        predicted_class = predicted.item()
+        
+        print(f"\nPredicted class: {CLASS_NAMES[predicted_class]}")
         print(f"Confidence: {confidence*100:.2f}%")
         
-        # Return None if confidence is below threshold
-        if confidence < confidence_threshold:
-            print(f"Confidence below threshold ({confidence_threshold*100:.0f}%)")
+        # Lower the threshold to 0.3
+        if confidence > 0.3:  # Adjusted threshold
+            return CLASS_NAMES[predicted_class], confidence
+        else:
             return None, confidence
-        
-        return CLASS_NAMES[predicted_class_idx], confidence
-        
+            
     except Exception as e:
-        print(f"Error during prediction: {str(e)}")
-        raise
+        print(f"Error in prediction: {str(e)}")
+        return None, 0.0
+
+def get_class_name(idx):
+    """Get class name from index"""
+    return CLASS_NAMES[idx]

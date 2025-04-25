@@ -132,10 +132,11 @@ body {
     margin-bottom: 1.5rem;
 }
 
-label {
+.upload-label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
+    color: var(--secondary-color);
 }
 
 select, input[type="file"] {
@@ -189,20 +190,24 @@ select, input[type="file"] {
     font-weight: 600;
     color: var(--secondary-color);
     margin-bottom: 0.5rem;
+    font-size: 1.2rem;
 }
 
 .model-accuracy {
-    font-size: 1.2rem;
-    color: var(--primary-color);
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+    margin-top: 0.8rem;
+    font-weight: 500;
 }
 
 .model-prediction {
     font-size: 1.4rem;
     margin-top: 0.5rem;
-    padding: 0.5rem;
+    padding: 0.8rem;
     border-radius: 5px;
     background-color: var(--success-color);
     color: white;
+    font-weight: 500;
 }
 
 .result-image {
@@ -228,6 +233,9 @@ select, input[type="file"] {
 .warning {
     background-color: var(--warning-color);
     color: white;
+    padding: 0.8rem;
+    border-radius: 5px;
+    font-weight: 500;
 }
 
 .error {
@@ -265,4 +273,34 @@ select, input[type="file"] {
     .result-section {
         grid-template-columns: 1fr;
     }
+}
+
+.drop-zone:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.drop-zone__input:focus {
+    outline: none;
+}
+
+[role="alert"] {
+    margin-top: 0.5rem;
+}
+
+/* Improve focus visibility */
+:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Skip outline for mouse users */
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Show outline for keyboard users */
+:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 } 
