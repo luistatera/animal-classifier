@@ -26,10 +26,10 @@
                              role="button" 
                              tabindex="0" 
                              aria-label="Drop zone for uploading images">
-                            <span class="drop-zone__prompt">
-                                <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
+                            <div class="drop-zone__prompt">
+                                <i class="fas fa-cloud-arrow-up fa-3x" aria-hidden="true"></i>
                                 <span>Drop image here or click to upload</span>
-                            </span>
+                            </div>
                             <input type="file" 
                                    name="file" 
                                    id="file" 
@@ -57,8 +57,9 @@
                         <div class="model-prediction">
                             {{ result.label }}
                         </div>
-                        <div class="model-accuracy">
-                            Confidence: {{ "%.2f"|format(result.confidence * 100) }}%
+                        <div class="confidence-container">
+                            <div class="confidence-bar" style="width: {{ result.confidence * 100 }}%"></div>
+                            <span class="confidence-text">Confidence: {{ "%.2f"|format(result.confidence * 100) }}%</span>
                         </div>
                         {% elif result.warning %}
                         <div class="prediction-result warning" role="alert">
@@ -79,52 +80,6 @@
         </div>
     </footer>
 
-    <script>
-        document.querySelectorAll(".drop-zone").forEach(dropZone => {
-            const input = dropZone.querySelector(".drop-zone__input");
-            const prompt = dropZone.querySelector(".drop-zone__prompt");
-
-            // Handle click
-            dropZone.addEventListener("click", (e) => {
-                input.click();
-            });
-
-            // Handle keyboard interaction
-            dropZone.addEventListener("keydown", (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    input.click();
-                }
-            });
-
-            input.addEventListener("change", (e) => {
-                if (input.files.length) {
-                    document.getElementById("classifierForm").submit();
-                }
-            });
-
-            dropZone.addEventListener("dragover", (e) => {
-                e.preventDefault();
-                dropZone.classList.add("drop-zone--over");
-            });
-
-            ["dragleave", "dragend"].forEach((type) => {
-                dropZone.addEventListener(type, (e) => {
-                    dropZone.classList.remove("drop-zone--over");
-                });
-            });
-
-            dropZone.addEventListener("drop", (e) => {
-                e.preventDefault();
-
-                if (e.dataTransfer.files.length) {
-                    input.files = e.dataTransfer.files;
-                    document.getElementById("classifierForm").submit();
-                }
-
-                dropZone.classList.remove("drop-zone--over");
-            });
-        });
-    </script>
+    <script src="{{ url_for('static', filename='upload.js') }}"></script>
 </body>
 </html>

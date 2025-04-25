@@ -4,28 +4,12 @@ import os
 import logging
 from io import BytesIO
 import base64
-from google.cloud import secretmanager
-
-def get_secret(secret_id):
-    try:
-        client = secretmanager.SecretManagerServiceClient()
-        name = f"projects/chiaraguru/secrets/{secret_id}/versions/latest"
-        response = client.access_secret_version(request={"name": name})
-        return response.payload.data.decode("UTF-8")
-    except Exception as e:
-        app.logger.error(f"Error fetching secret: {e}")
-        return None
 
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
 
-# Get the secret key from GCP Secret Manager
-secret_key = get_secret('FLASK_SECRET_KEY')
-if secret_key:
-    app.secret_key = secret_key
-else:
-    app.logger.warning("Using fallback secret key - not recommended for production")
-    app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-123')
+# Get the secret key from environment variable
+app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-123')
 
 # Model display name mapping
 MODEL_DISPLAY_NAMES = {
@@ -38,7 +22,7 @@ def add_security_headers(response):
     """Add security headers to each response"""
     # Security headers
     response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['Content-Security-Policy'] = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline';"
+    response.headers['Content-Security-Policy'] = "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com;"
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     
@@ -103,6 +87,7 @@ def index():
                                 "label": label,
                                 "confidence": confidence
                             }
+                            app.logger.debug(f"Model: {display_name}, Label: {label}, Confidence: {confidence}")
                     
                     return render_template("index.html", 
                                         image=image_data_url,
@@ -125,49 +110,63 @@ def index():
 def project():
     try:
         if request.method == "POST":
-            if 'file' in request.files and request.files['file'].filename != '':
-                file = request.files["file"]
-                
-                # Read the file content once and store it
-                file_content = file.read()
-                file.seek(0)  # Reset for data URL creation
-                
-                # Convert image to data URL and store in session
-                image_data_url = get_image_data_url(file)
-                session['current_image'] = image_data_url
-                
-                try:
-                    model_results = {}
-                    available_models = get_available_models()
-                    
-                    # Create a new BytesIO object for each model prediction
-                    for model_name in available_models:
-                        model, model_type = load_model(model_name)
-                        # Create a fresh BytesIO object for each prediction
-                        img_bytes = BytesIO(file_content)
-                        label, confidence = predict_label(model, img_bytes, model_type)
-                        
-                        display_name = MODEL_DISPLAY_NAMES.get(model_name, model_name)
-                        
-                        if label is None:
-                            model_results[display_name] = {
-                                "warning": f"Image not recognized as any of the 10 animals (confidence: {confidence * 100:.2f}%)"
-                            }
-                        else:
-                            model_results[display_name] = {
-                                "label": label,
-                                "confidence": confidence
-                            }
-                    
-                    return render_template("project.html", 
-                                        image=image_data_url,
-                                        model_results=model_results)
-                except Exception as e:
-                    app.logger.error(f"Prediction error: {str(e)}")
-                    return render_template("project.html", 
-                                        error=f"Error during prediction: {str(e)}")
+            app.logger.debug("POST request received")
+            app.logger.debug(f"Files in request: {request.files}")
             
-            return render_template("project.html", error="Please upload an image first")
+            if 'file' not in request.files:
+                app.logger.error("No file part in the request")
+                return render_template("project.html", error="No file part in the request")
+                
+            file = request.files['file']
+            app.logger.debug(f"File received: {file.filename}")
+            
+            if file.filename == '':
+                app.logger.error("No selected file")
+                return render_template("project.html", error="No selected file")
+            
+            if not file:
+                app.logger.error("File is None")
+                return render_template("project.html", error="File is None")
+                
+            # Read the file content once and store it
+            file_content = file.read()
+            file.seek(0)  # Reset for data URL creation
+            
+            # Convert image to data URL and store in session
+            image_data_url = get_image_data_url(file)
+            session['current_image'] = image_data_url
+            
+            try:
+                model_results = {}
+                available_models = get_available_models()
+                
+                # Create a new BytesIO object for each model prediction
+                for model_name in available_models:
+                    model, model_type = load_model(model_name)
+                    # Create a fresh BytesIO object for each prediction
+                    img_bytes = BytesIO(file_content)
+                    label, confidence = predict_label(model, img_bytes, model_type)
+                    
+                    display_name = MODEL_DISPLAY_NAMES.get(model_name, model_name)
+                    
+                    if label is None:
+                        model_results[display_name] = {
+                            "warning": f"Image not recognized as any of the 10 animals (confidence: {confidence * 100:.2f}%)"
+                        }
+                    else:
+                        model_results[display_name] = {
+                            "label": label,
+                            "confidence": confidence
+                        }
+                        app.logger.debug(f"Model: {display_name}, Label: {label}, Confidence: {confidence}")
+                
+                return render_template("project.html", 
+                                    image=image_data_url,
+                                    model_results=model_results)
+            except Exception as e:
+                app.logger.error(f"Prediction error: {str(e)}")
+                return render_template("project.html", 
+                                    error=f"Error during prediction: {str(e)}")
         
         session.clear()
         return render_template("project.html")
