@@ -61,7 +61,16 @@ _(Optional: Hosted on Google Cloud Platform / AWS / Render / etc.)_
 
 ## 📄 Project Structure
 
-project2-animal-classifier/ │ ├── data/ # Sample images for testing ├── models/ # Saved models (CNN, VGG16, etc.) ├── app/ # Flask app files │ └── app.py ├── notebooks/ # Development notebooks ├── utils/ # Data loading, preprocessing, model utils ├── requirements.txt ├── report.pdf # Final project report └── README.md
+project2-animal-classifier/
+├── data/              # Sample images for testing
+├── models/            # Saved models (CNN, VGG16, etc.)
+├── app/               # Flask app files
+│   └── app.py
+├── notebooks/         # Development notebooks
+├── utils/             # Data loading, preprocessing, model utils
+├── requirements.txt
+├── report.pdf         # Final project report
+└── README.md
 
 
 ## 📚 Key Learnings
