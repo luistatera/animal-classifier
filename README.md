@@ -1,4 +1,4 @@
-# 🧠 Animal Image Classifier with CNN (Ironhack AI/ML Bootcamp - Project 2)
+# 🧠 Animal Image Classifier with CNN (Ironhack AI Engineer Bootcamp - Group 1 - Project 2)
 
 This project is part of the Ironhack AI/ML Bootcamp and demonstrates a deep learning application using Convolutional Neural Networks (CNNs) to classify images of animals into predefined categories.
 
