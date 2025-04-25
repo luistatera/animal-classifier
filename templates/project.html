@@ -1,199 +1,131 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Project Animal Classifier</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .form-group {
-      margin: 20px 0;
-    }
-    select, input[type="file"] {
-      padding: 8px;
-      margin: 5px 0;
-      width: 100%;
-      max-width: 300px;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .result {
-      margin-top: 20px;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    .error {
-      color: #721c24;
-      background-color: #f8d7da;
-      border: 1px solid #f5c6cb;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 4px;
-    }
-    .warning {
-      color: #856404;
-      background-color: #fff3cd;
-      border: 1px solid #ffeeba;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 4px;
-    }
-    img {
-      max-width: 100%;
-      height: auto;
-      margin-top: 20px;
-    }
-    #uploadForm, #modelForm {
-      margin-bottom: 20px;
-    }
-    .drop-zone {
-      width: 100%;
-      max-width: 300px;
-      height: 200px;
-      padding: 25px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-weight: 500;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: #777;
-      border: 2px dashed #4CAF50;
-      border-radius: 10px;
-      margin: 0 auto;
-      transition: border-color 0.2s ease-in-out;
-    }
-
-    .drop-zone--over {
-      border-color: #45a049;
-      background-color: rgba(76, 175, 80, 0.1);
-    }
-
-    .drop-zone__input {
-      display: none;
-    }
-
-    .drop-zone__prompt {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .drop-zone__prompt i {
-      font-size: 2.5rem;
-      color: #4CAF50;
-    }
-  </style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Classifier - Project Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <h1>Project Animal Classifier</h1>
-  <p>This model can identify the following 10 animals: dog (cane), horse (cavallo), elephant (elefante), butterfly (farfalla), chicken (gallina), cat (gatto), cow (mucca), sheep (pecora), spider (ragno), and squirrel (scoiattolo).</p>
-  
-  {% if error %}
-    <div class="error">
-      {{ error }}
-    </div>
-  {% endif %}
+    <header class="header">
+        <div class="container">
+            <h1>Animal Classifier</h1>
+            <p>Group 1 - Project 2 | Ironhack Bootcamp</p>
+        </div>
+    </header>
 
-  {% if warning %}
-    <div class="warning">
-      {{ warning }}
-    </div>
-  {% endif %}
+    <main class="container">
+        <div class="main-content">
+            <div class="project-layout">
+                <!-- Left side: Animal list -->
+                <div class="card">
+                    <h2>Supported Animals</h2>
+                    <p>This classifier can identify the following animals:</p>
+                    <ul class="animal-list">
+                        <li>🐕 Dog (cane)</li>
+                        <li>🐎 Horse (cavallo)</li>
+                        <li>🐘 Elephant (elefante)</li>
+                        <li>🦋 Butterfly (farfalla)</li>
+                        <li>🐔 Chicken (gallina)</li>
+                        <li>🐱 Cat (gatto)</li>
+                        <li>🐄 Cow (mucca)</li>
+                        <li>🐑 Sheep (pecora)</li>
+                        <li>🕷️ Spider (ragno)</li>
+                        <li>🐿️ Squirrel (scoiattolo)</li>
+                    </ul>
+                </div>
 
-  <!-- Upload form with drag & drop -->
-  <form id="uploadForm" method="POST" enctype="multipart/form-data">
-    <div class="drop-zone">
-      <span class="drop-zone__prompt">
-        <i class="fas fa-cloud-upload-alt"></i>
-        <span>Drop image here or click to upload</span>
-      </span>
-      <input type="file" name="file" class="drop-zone__input" id="file" required accept="image/*">
-    </div>
-  </form>
+                <!-- Right side: Upload area -->
+                <div class="card">
+                    <form method="POST" enctype="multipart/form-data" id="classifierForm">
+                        <div class="form-group">
+                            <label>Upload Image:</label>
+                            <div class="drop-zone">
+                                <span class="drop-zone__prompt">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span>Drop image here or click to upload</span>
+                                </span>
+                                <input type="file" name="file" class="drop-zone__input" id="file" required accept="image/*">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-  {% if image %}
-    <form id="modelForm" method="POST">
-      <div class="form-group">
-        <label for="model">Select Model:</label><br>
-        <select name="model" id="model" onchange="this.form.submit()">
-          <option value="best_cnn_model_luis.pth" {% if selected_model == "best_cnn_model_luis.pth" %}selected{% endif %}>
-            Simple CNN Model
-          </option>
-          <option value="best_resnet_model.pth" {% if selected_model == "best_resnet_model.pth" %}selected{% endif %}>
-            ResNet18 Model
-          </option>
-        </select>
-      </div>
-    </form>
+            {% if image %}
+            <div class="card result-section">
+                <div class="result-image-container">
+                    <img src="{{ image }}" alt="Uploaded image" class="result-image">
+                </div>
+                
+                <div class="model-comparison">
+                    {% for model_name, result in model_results.items() %}
+                    <div class="model-result">
+                        <div class="model-name">{{ model_name }}</div>
+                        {% if result.label %}
+                        <div class="model-prediction">
+                            {{ result.label }}
+                        </div>
+                        <div class="model-accuracy">
+                            Confidence: {{ "%.2f"|format(result.confidence * 100) }}%
+                        </div>
+                        {% elif result.warning %}
+                        <div class="prediction-result warning">
+                            {{ result.warning }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
 
-    {% if label %}
-      <div class="result">
-        <h2>Prediction: {{ label }}</h2>
-        <p>Confidence: {{ (confidence * 100) | round(2) }}%</p>
-        <img src="{{ image }}" alt="Uploaded Image">
-      </div>
-    {% else %}
-      <div class="result">
-        <img src="{{ image }}" alt="Uploaded Image">
-      </div>
-    {% endif %}
-  {% endif %}
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 Group 1 - Project 2 | Ironhack Bootcamp</p>
+        </div>
+    </footer>
 
-  <script>
-    document.querySelectorAll(".drop-zone").forEach(dropZone => {
-      const input = dropZone.querySelector(".drop-zone__input");
-      const prompt = dropZone.querySelector(".drop-zone__prompt");
+    <script>
+        document.querySelectorAll(".drop-zone").forEach(dropZone => {
+            const input = dropZone.querySelector(".drop-zone__input");
+            const prompt = dropZone.querySelector(".drop-zone__prompt");
 
-      dropZone.addEventListener("click", (e) => {
-        input.click();
-      });
+            dropZone.addEventListener("click", (e) => {
+                input.click();
+            });
 
-      input.addEventListener("change", (e) => {
-        if (input.files.length) {
-          document.getElementById("uploadForm").submit();
-        }
-      });
+            input.addEventListener("change", (e) => {
+                if (input.files.length) {
+                    document.getElementById("classifierForm").submit();
+                }
+            });
 
-      dropZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropZone.classList.add("drop-zone--over");
-      });
+            dropZone.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropZone.classList.add("drop-zone--over");
+            });
 
-      ["dragleave", "dragend"].forEach((type) => {
-        dropZone.addEventListener(type, (e) => {
-          dropZone.classList.remove("drop-zone--over");
+            ["dragleave", "dragend"].forEach((type) => {
+                dropZone.addEventListener(type, (e) => {
+                    dropZone.classList.remove("drop-zone--over");
+                });
+            });
+
+            dropZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+
+                if (e.dataTransfer.files.length) {
+                    input.files = e.dataTransfer.files;
+                    document.getElementById("classifierForm").submit();
+                }
+
+                dropZone.classList.remove("drop-zone--over");
+            });
         });
-      });
-
-      dropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-
-        if (e.dataTransfer.files.length) {
-          input.files = e.dataTransfer.files;
-          document.getElementById("uploadForm").submit();
-        }
-
-        dropZone.classList.remove("drop-zone--over");
-      });
-    });
-  </script>
+    </script>
 </body>
 </html> 
