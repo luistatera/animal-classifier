@@ -1,4 +1,22 @@
+# Flask
 Flask==2.0.1
-Pillow==8.3.1
-torch==2.0.0
-torchvision==0.15.1
+
+# Core ML & Vision
+torch
+torchvision
+torchaudio
+
+# Visualization
+matplotlib>=3.0
+
+# Image handling
+Pillow>=9.0
+
+# Notebooks
+notebook
+
+# Evaluation
+scikit-learn
+
+# Seaborn
+seaborn>=0.11

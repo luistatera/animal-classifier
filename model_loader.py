@@ -11,17 +11,6 @@ from io import BytesIO
 # Define the class labels in the same order used during training
 CLASS_NAMES = ['cane', 'cavallo', 'elefante', 'farfalla', 'gallina', 'gatto', 'mucca', 'pecora', 'ragno', 'scoiattolo']
 
-# English translations for reference:
-# cane = dog
-# cavallo = horse
-# elefante = elephant
-# farfalla = butterfly
-# gallina = chicken
-# gatto = cat
-# mucca = cow
-# pecora = sheep
-# ragno = spider
-# scoiattolo = squirrel
 
 def preprocess_image_tf(image_path, target_size=(224, 224)):
     """
