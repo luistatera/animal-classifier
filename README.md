@@ -1,65 +1,53 @@
-# 🧠 Animal Image Classifier with CNN (Ironhack AI Engineer Bootcamp - Group 1 - Project 2)
+# 🧠 Animal Image Classifier (Ironhack AI/ML Bootcamp - Project 2)
 
-This project is part of the Ironhack AI/ML Bootcamp and demonstrates a deep learning application using Convolutional Neural Networks (CNNs) to classify images of animals into predefined categories.
-
-## 🗂 Project Overview
-
-In this project, we:
-
-- Built and trained a CNN model from scratch using PyTorch
-- Preprocessed a custom dataset of ~28,000 animal images across 10 categories
-- Evaluated model performance with standard classification metrics
-- Performed Transfer Learning using pretrained models (e.g., VGG16 or Inception)
-- Deployed the final model using Flask for image classification via a web interface
+This project showcases an image classification system using deep learning. We applied Convolutional Neural Networks (CNNs) with **Transfer Learning (ResNet18)** to classify animal images into 10 categories. The project includes model training, evaluation, and deployment via a Flask web app.
 
 ## 📁 Dataset
 
-We used the **Animals-10 dataset** from Kaggle:  
-👉 [Download here](https://www.kaggle.com/datasets/alessiocorrado99/animals10/data)
+We used the [Animals-10 dataset](https://www.kaggle.com/datasets/alessiocorrado99/animals10/data), which contains ~28,000 images in 10 categories:
 
-**Categories:**  
-`dog, cat, horse, spider, butterfly, chicken, sheep, cow, squirrel, elephant`
+- `cat`, `dog`, `horse`, `elephant`, `butterfly`, `chicken`, `cow`, `sheep`, `squirrel`, `spider`
 
 ## 🧪 Model Development
 
 ### 🔧 Preprocessing
 
-- Image resizing, normalization
-- Data augmentation (e.g., flipping, rotation)
-- Train-validation split
+- Resized to 224x224
+- Normalization to ImageNet mean/std
+- Data augmentation: RandomHorizontalFlip, RandomRotation, RandomCrop
+- Split: 80% training / 20% validation
 
-### 🏗 CNN Architecture
+### 🧠 Model Architecture
 
-The base CNN includes:
+- **Transfer Learning with ResNet18**
+  - Frozen early layers
+  - Custom fully connected classifier for our 10 animal classes
 
-- Convolutional and pooling layers
-- Batch normalization and dropout
-- Fully connected layers with softmax activation
+### ⚙️ Training
 
-We also experimented with **transfer learning**, using models like **VGG16**, fine-tuned for our dataset.
-
-### 🧠 Training
-
-- Optimizer: Adam
-- Loss: CrossEntropyLoss
-- Techniques: Early stopping, learning rate scheduler
+- Optimizer: `Adam`
+- Loss function: `CrossEntropyLoss`
+- Techniques: `EarlyStopping`, `lr_scheduler`
+- Device: GPU/CPU fallback using PyTorch
 
 ### 📊 Evaluation
 
-- Accuracy, precision, recall, F1-score
-- Confusion matrix visualization
-- Best model achieved XX% accuracy on the validation set
+- Metrics: Accuracy, Precision, Recall, F1-Score
+- Confusion Matrix
+- Best accuracy: **≈91%** on validation set
 
 ## 🌐 Deployment
 
-We deployed the best-performing model using Flask:
+We deployed the model using a Flask web app:
 
-- Users can upload one or more images
-- The app returns predictions and probabilities per class
+- Users can upload images
+- The app returns:
+  - Predicted class
+  - Top 3 class probabilities
+- Simple and responsive UI using HTML templates
 
-_(Optional: Hosted on Google Cloud Platform / AWS / Render / etc.)_
 
-## 📄 Project Structure
+## 📂 Project Structure
 
 project2-animal-classifier/
 ├── data/              # Sample images for testing
@@ -71,6 +59,14 @@ project2-animal-classifier/
 ├── requirements.txt
 ├── report.pdf         # Final project report
 └── README.md
+
+
+## 🚀 Setup Instructions
+
+1. Clone the repo  
+2. Install dependencies  
+```bash
+pip install -r requirements.txt
 
 
 ## 📚 Key Learnings
