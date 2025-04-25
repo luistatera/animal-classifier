@@ -1,5 +1,6 @@
 # Model files
-models/
+models/*
+!models/cnn_model.keras
 *.pth
 *.keras
 *.h5
