@@ -103,10 +103,11 @@ class SimpleCNN(torch.nn.Module):
         # Fully connected layers
         self.fc1 = torch.nn.Linear(self._to_linear, 256)
         self.fc2 = torch.nn.Linear(256, num_classes)
+        self.dropout = torch.nn.Dropout(p=0.5)
         
     def _initialize_size(self):
         # Create a sample input to calculate the size after convolutions
-        x = torch.randn(1, 3, 128, 128)  # Changed from 224x224 to 128x128
+        x = torch.randn(1, 3, 128, 128)  # Input size is 128x128
         x = self.conv_block1(x)
         x = self.conv_block2(x)
         x = self.conv_block3(x)
@@ -119,7 +120,7 @@ class SimpleCNN(torch.nn.Module):
         x = self.conv_block3(x)
         x = x.view(x.size(0), -1)  # Flatten
         x = torch.nn.functional.relu(self.fc1(x))
-        x = torch.nn.functional.dropout(x, p=0.5, training=self.training)
+        x = self.dropout(x)
         x = self.fc2(x)
         return x
 
@@ -191,9 +192,15 @@ def predict_label(model, image_path, model_type, confidence_threshold=0.3):
             confidence = float(probabilities[0][predicted_class_idx])
             
         else:  # PyTorch model
+            # Ensure model is in evaluation mode
+            model.eval()
+            
             # Preprocess image for PyTorch
             device = next(model.parameters()).device
             processed_image = preprocess_image_torch(image_path).to(device)
+            
+            print(f"\nModel Device: {device}")
+            print(f"Input Image Shape: {processed_image.shape}")
             
             # Get predictions
             with torch.no_grad():
@@ -212,6 +219,7 @@ def predict_label(model, image_path, model_type, confidence_threshold=0.3):
         
         # Debug information
         print("\nFinal Prediction:")
+        print(f"Predicted class index: {predicted_class_idx}")
         print(f"Predicted class: {CLASS_NAMES[predicted_class_idx]}")
         print(f"Confidence: {confidence*100:.2f}%")
         
