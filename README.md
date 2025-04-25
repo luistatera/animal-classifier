@@ -63,7 +63,7 @@ _(Optional: Hosted on Google Cloud Platform / AWS / Render / etc.)_
 
 project2-animal-classifier/
 ├── data/              # Sample images for testing
-├── models/            # Saved models (CNN, VGG16, etc.)
+├── models/            # Saved models (CNN, VGG16, etc.) -- ignored because of the size
 ├── app/               # Flask app files
 │   └── app.py
 ├── notebooks/         # Development notebooks
