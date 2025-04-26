@@ -116,3 +116,9 @@ This project represents the completion of our second major milestone in the Iron
 
 **Made with ❤️ by Group 1 – Project 2 @ Ironhack 2025**
 
+<footer class="footer">
+    <div class="container">
+        <p>© 2025 Group 1 - Project 2 | Ironhack Bootcamp</p>
+    </div>
+</footer>
+
