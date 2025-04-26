@@ -55,8 +55,7 @@ animal-classifier/
 ├── docs/              # Project documentation
 ├── img2test/          # Directory for test images
 ├── models/            # Trained model files
-│   ├── best_cnn_model_luis.pth
-│   └── best_resnet_model.pth
+│   └── cnn_model.keras
 ├── notebooks/         # Jupyter notebooks for development
 ├── static/            # Static files (CSS, JS, images)
 │   ├── uploads/       # Directory for uploaded images
