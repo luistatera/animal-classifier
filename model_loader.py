@@ -189,6 +189,7 @@ def predict_label(model, image_data, model_type):
         # Apply transformations
         image_tensor = transform(image).unsqueeze(0)
         print(f"Transformed image tensor shape: {image_tensor.shape}")
+        print(f"Tensor value range: [{torch.min(image_tensor).item()}, {torch.max(image_tensor).item()}]")
         
         # Move to the same device as the model
         device = next(model.parameters()).device
@@ -198,31 +199,33 @@ def predict_label(model, image_data, model_type):
         # Get predictions
         with torch.no_grad():
             outputs = model(image_tensor)
+            print(f"Model outputs shape: {outputs.shape}")
+            print(f"Raw outputs: {outputs}")
+            
+            # Get probabilities using softmax
             probabilities = torch.nn.functional.softmax(outputs, dim=1)
+            print(f"Probabilities: {probabilities}")
+            
+            # Get the predicted class and confidence
             confidence, predicted = torch.max(probabilities, 1)
+            confidence = confidence.item()
+            predicted_idx = predicted.item()
             
-            # Print all class probabilities for debugging
-            probs = probabilities[0].cpu().numpy()
-            print("\nClass probabilities:")
-            for idx, (class_name, prob) in enumerate(zip(CLASS_NAMES, probs)):
-                print(f"{class_name}: {prob*100:.2f}%")
+            print(f"Predicted class index: {predicted_idx}")
+            print(f"Confidence: {confidence}")
             
-        # Get the predicted class and confidence
-        confidence = confidence.item()
-        predicted_class = predicted.item()
-        
-        print(f"\nPredicted class: {CLASS_NAMES[predicted_class]}")
-        print(f"Confidence: {confidence*100:.2f}%")
-        
-        # Lower the threshold to 0.3
-        if confidence > 0.3:  # Adjusted threshold
-            return CLASS_NAMES[predicted_class], confidence
-        else:
-            return None, confidence
-            
+            # Get the class name
+            if predicted_idx < len(CLASS_NAMES):
+                label = CLASS_NAMES[predicted_idx]
+                print(f"Predicted class: {label}")
+                return label, confidence
+            else:
+                print("Invalid class index")
+                return None, confidence
+                
     except Exception as e:
         print(f"Error in prediction: {str(e)}")
-        return None, 0.0
+        raise
 
 def get_class_name(idx):
     """Get class name from index"""

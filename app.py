@@ -1,9 +1,11 @@
-from flask import Flask, request, render_template, session
+from flask import Flask, request, render_template, session, url_for
 from model_loader import predict_label, get_available_models, load_model
 import os
 import logging
 from io import BytesIO
 import base64
+from werkzeug.utils import secure_filename
+import uuid
 
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
@@ -11,11 +13,31 @@ app.logger.setLevel(logging.DEBUG)
 # Get the secret key from environment variable
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-123')
 
+# Configure upload folder
+UPLOAD_FOLDER = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure upload directory exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 # Model display name mapping
 MODEL_DISPLAY_NAMES = {
     "best_cnn_model_luis.pth": "Simple CNN Model",
     "best_resnet_model.pth": "ResNet 50 Model"
 }
+
+def save_uploaded_file(file):
+    """Save uploaded file and return its path"""
+    # Generate a unique filename
+    filename = secure_filename(file.filename)
+    unique_filename = f"{uuid.uuid4()}_{filename}"
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+    
+    # Save the file
+    file.save(file_path)
+    
+    # Return the relative path for web access
+    return os.path.join('uploads', unique_filename)
 
 @app.after_request
 def add_security_headers(response):
@@ -57,24 +79,18 @@ def index():
             if 'file' in request.files and request.files['file'].filename != '':
                 file = request.files["file"]
                 
-                # Read the file content once and store it
-                file_content = file.read()
-                file.seek(0)  # Reset for data URL creation
-                
-                # Convert image to data URL and store in session
-                image_data_url = get_image_data_url(file)
-                session['current_image'] = image_data_url
+                # Save the file and get its path
+                image_path = save_uploaded_file(file)
+                full_image_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(image_path))
                 
                 try:
                     model_results = {}
                     available_models = get_available_models()
                     
-                    # Create a new BytesIO object for each model prediction
+                    # Use the saved file path for prediction
                     for model_name in available_models:
                         model, model_type = load_model(model_name)
-                        # Create a fresh BytesIO object for each prediction
-                        img_bytes = BytesIO(file_content)
-                        label, confidence = predict_label(model, img_bytes, model_type)
+                        label, confidence = predict_label(model, full_image_path, model_type)
                         
                         display_name = MODEL_DISPLAY_NAMES.get(model_name, model_name)
                         
@@ -90,7 +106,7 @@ def index():
                             app.logger.debug(f"Model: {display_name}, Label: {label}, Confidence: {confidence}")
                     
                     return render_template("index.html", 
-                                        image=image_data_url,
+                                        image=image_path,
                                         model_results=model_results)
                 except Exception as e:
                     app.logger.error(f"Prediction error: {str(e)}")
@@ -99,7 +115,6 @@ def index():
             
             return render_template("index.html", error="Please upload an image first")
         
-        session.clear()
         return render_template("index.html")
     
     except Exception as e:
@@ -128,24 +143,18 @@ def project():
                 app.logger.error("File is None")
                 return render_template("project.html", error="File is None")
                 
-            # Read the file content once and store it
-            file_content = file.read()
-            file.seek(0)  # Reset for data URL creation
-            
-            # Convert image to data URL and store in session
-            image_data_url = get_image_data_url(file)
-            session['current_image'] = image_data_url
+            # Save the file and get its path
+            image_path = save_uploaded_file(file)
+            full_image_path = os.path.join(app.config['UPLOAD_FOLDER'], os.path.basename(image_path))
             
             try:
                 model_results = {}
                 available_models = get_available_models()
                 
-                # Create a new BytesIO object for each model prediction
+                # Use the saved file path for prediction
                 for model_name in available_models:
                     model, model_type = load_model(model_name)
-                    # Create a fresh BytesIO object for each prediction
-                    img_bytes = BytesIO(file_content)
-                    label, confidence = predict_label(model, img_bytes, model_type)
+                    label, confidence = predict_label(model, full_image_path, model_type)
                     
                     display_name = MODEL_DISPLAY_NAMES.get(model_name, model_name)
                     
@@ -161,14 +170,13 @@ def project():
                         app.logger.debug(f"Model: {display_name}, Label: {label}, Confidence: {confidence}")
                 
                 return render_template("project.html", 
-                                    image=image_data_url,
+                                    image=image_path,
                                     model_results=model_results)
             except Exception as e:
                 app.logger.error(f"Prediction error: {str(e)}")
                 return render_template("project.html", 
                                     error=f"Error during prediction: {str(e)}")
         
-        session.clear()
         return render_template("project.html")
     
     except Exception as e:

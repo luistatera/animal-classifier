@@ -72,7 +72,7 @@
             {% if image %}
             <div class="card result-section">
                 <div class="result-image-container">
-                    <img src="{{ image }}" alt="Uploaded image for classification" class="result-image">
+                    <img src="{{ url_for('static', filename=image) }}" alt="Uploaded image for classification" class="result-image">
                 </div>
                 
                 <div class="model-comparison">

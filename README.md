@@ -52,11 +52,19 @@ animal-classifier/
 ├── requirements.txt    # Project dependencies
 ├── .gitignore         # Git ignore rules
 ├── .gcloudignore      # Google Cloud ignore rules
+├── docs/              # Project documentation
 ├── img2test/          # Directory for test images
 ├── models/            # Trained model files
+│   ├── best_cnn_model_luis.pth
+│   └── best_resnet_model.pth
 ├── notebooks/         # Jupyter notebooks for development
 ├── static/            # Static files (CSS, JS, images)
+│   ├── uploads/       # Directory for uploaded images
+│   ├── style.css
+│   └── upload.js
 ├── templates/         # HTML templates
+│   ├── index.html
+│   └── project.html
 ├── utils/             # Utility functions
 └── temp/              # Temporary files
 ```
