@@ -88,7 +88,7 @@ The application will be available at `http://localhost:5000`
 
 ## 📚 Key Learnings
 
-- Hands-on experience with CNNs in PyTorch
+- Hands-on experience with CNNs and ResNet
 - Applied real-world ML practices: data prep, tuning, and evaluation
 - Gained practical insights into experimentation and critical thinking in ML
 
